@@ -12,7 +12,6 @@ import {
         FormHelperText } from '@chakra-ui/react';
 import { Logo } from '../Logo';
 import firebase, { persistenceMode } from './../../config/firebase';
-import { useEffect } from 'react';
 
 const validationSchema = yup.object().shape({
   email: yup.string().email('E-mail inválido').required('Preenchimento obrigatório'),
