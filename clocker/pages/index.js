@@ -9,11 +9,10 @@ import {
         Text, 
         FormControl, 
         FormLabel, 
-        InputGroup,
-        InputLeftAddon,
         FormHelperText } from '@chakra-ui/react';
 import { Logo } from '../components';
-import firebase from '../config/firebase';
+import firebase, { persistenceMode } from '../config/firebase';
+import { useEffect } from 'react';
 
 const validationSchema = yup.object().shape({
   email: yup.string().email('E-mail inválido').required('Preenchimento obrigatório'),
@@ -29,6 +28,8 @@ export default function Home() {
           handleBlur,
           handleSubmit } = useFormik({
     onSubmit: async (values, form) => { 
+      firebase.auth().setPersistence(persistenceMode);
+
       try {
         const user =  await firebase.auth().signInWithEmailAndPassword(values.email, values.password);
         console.log("OK", user)
@@ -43,6 +44,11 @@ export default function Home() {
       password: ' '
     }
   });
+
+  useEffect(() =>{
+    console.log("Sessao ativa", firebase.auth().currentUser)
+  }, []);
+
   return (
     <Container centerContent p={4}>
       <Logo />
