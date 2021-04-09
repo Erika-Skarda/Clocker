@@ -1,6 +1,8 @@
 import { useFormik } from 'formik';
 import * as yup from 'yup';
 import Link from 'next/link';
+import { useEffect } from 'react';
+import { useRouter } from 'next/router';
 import { 
         Container, 
         Box, 
@@ -10,45 +12,38 @@ import {
         FormControl, 
         FormLabel, 
         FormHelperText } from '@chakra-ui/react';
-import { Logo } from '../Logo';
-import { persistenceMode, firebaseClient } from '../../config/firebase/client';
+import { Logo, useAuth} from '../components';
 
 const validationSchema = yup.object().shape({
   email: yup.string().email('E-mail inválido').required('Preenchimento obrigatório'),
   password: yup.string().required('Preenchimento obrigatório')
 });
 
-export const Login = () =>  {
+export default function Login() {
+  const [auth, { login }] = useAuth();
+  const router = useRouter();
+
+  
   const { values,
-          errors,
-          touched,
-          isSubmitting,
-          handleChange,
-          handleBlur,
-          handleSubmit } = useFormik({
-    onSubmit: async (values, form) => { 
-      firebaseClient.auth().setPersistence(persistenceMode);
-
-      try {
-        const user =  await firebaseClient.auth().signInWithEmailAndPassword(values.email, values.password);
-        console.log("OK", user)
-        console.log("OK_USER", firebaseClient.auth().currentUser)
-      } catch(error) {
-        console.log('ERRROR',  error)
-      }
-    },
-    validationSchema,
-    initialValues: {
-      email: '',
-      username: '',
-      password: ' '
-    }
-  });
-
-  // useEffect(() =>{
-  //   console.log("Sessao ativa", firebaseClient.auth().currentUser)
-  // }, []);
-
+    errors,
+    touched,
+    isSubmitting,
+    handleChange,
+    handleBlur,
+    handleSubmit } = useFormik({
+        onSubmit: login,
+        validationSchema,
+        initialValues: {
+            email: '',
+            username: '',
+            password: ' '
+        }
+    });
+    
+    useEffect(() => {
+      auth.user && router.push('/agenda')
+    }, [auth.user]);
+    
   return (
     <Container centerContent p={4}>
       <Logo />
